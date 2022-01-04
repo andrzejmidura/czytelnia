@@ -6,27 +6,19 @@ public class Writer extends Reader{
     public void run() {
         while (true) {
             try {
-//                System.out.println(this.getName() + " wants to write and read.");
                 this.res.writeLock();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (InterruptedException ignored) {}
             System.out.println("        " + this.getName() + " writes and reads...      In room: " + (5-this.res.readersSemaphore.availablePermits()) + " readers, " + (1-this.res.writersSemaphore.availablePermits()) + " writers.");
 
             try {
                 sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (InterruptedException ignored) {}
 
-//            System.out.println(this.getName() + " leaves.");
             this.res.writeUnlock();
 
             try {
-                sleep(15000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                sleep(10000);
+            } catch (InterruptedException ignored) {}
         }
     }
 
