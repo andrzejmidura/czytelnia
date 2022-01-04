@@ -6,12 +6,26 @@ public class Writer extends Reader{
     public void run() {
         while (true) {
             try {
-                sleep(5000);
+                System.out.println(this.getName() + " wants to write and read.");
+                this.res.writeLock();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            this.res.enter(this);
-            this.res.overwriteData(this, this.dataToWrite);
+            System.out.println("        " + this.getName() + " writes and reads...");
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println(this.getName() + " leaves.");
+            this.res.writeUnlock();
+
+            try {
+                sleep(15000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

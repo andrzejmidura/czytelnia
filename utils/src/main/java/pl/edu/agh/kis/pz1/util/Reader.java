@@ -8,12 +8,31 @@ public class Reader extends Thread{
     public void run() {
         while(true) {
             try {
-                sleep(5000);
+                System.out.println(this.getName() + " wants to read.");
+                this.res.readLock();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            this.res.enter(this);
-            res.readData(this);
+
+            System.out.println("        " + this.getName() + " reads...");
+
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            try {
+                System.out.println(this.getName() + " leaves.");
+                this.res.readUnlock();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                sleep(15000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -1,74 +1,50 @@
 package pl.edu.agh.kis.pz1.util;
 
-import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 public class Resources {
-    public static final int MAX_READERS = 5;
-    public static final int MAX_WRITERS = 1;
 
-    public boolean enter(Reader reader) {
-        if (currentReaders.size()<5 && currentWriter.isEmpty()) {
-            currentReaders.add(reader);
-            return true;
-        } else {
-            return false;
+    /**
+     * Get read lock
+     */
+    public void readLock() throws InterruptedException {
+        readersSemaphore.acquire();
+        if(readersInRoom == 0) {                // the first Reader acquires writersSemaphore to prevent writers to enter room
+            writersSemaphore.acquire();
         }
-    }
-    public boolean enter(Writer writer) {
-        if (currentReaders.isEmpty() && currentWriter.isEmpty()) {
-            currentWriter.add(writer);
-            return true;
-        }
-        return false;
+        readersInRoom++;
+        readersSemaphore.release();
     }
 
-    public boolean exit(Reader reader) {
-        if (currentReaders.contains(reader)) {
-            currentReaders.remove(reader);
-            return true;
-        } else {
-
-            return false;
+    /**
+     * Release read lock
+     */
+    public void readUnlock() throws InterruptedException {
+        readersSemaphore.acquire();
+        readersInRoom--;
+        if(readersInRoom == 0){                 // if no readers left in room
+            writersSemaphore.release();
         }
-    }
-    public boolean exit(Writer writer) {
-        if (currentWriter.contains(writer)) {
-            currentWriter.remove(writer);
-            return true;
-        }
-        return false;
+        readersSemaphore.release();
     }
 
-    public void readData(Reader reader) {
-        if (currentReaders.contains(reader) || currentWriter.contains(reader)) {
-            System.out.println(reader.getName() + " reads. Readers: " + this.currentReaders.size() + ", Writers: " + this.currentWriter.size());
-            this.exit(reader);
-        } else {
-            System.out.println(reader.getName() + " has to wait to read the data...");
-        }
-    }
-    public void overwriteData(Writer writer, String newData) {
-        if (currentWriter.contains(writer)) {
-            this.data = newData;
-            System.out.println(writer.getName() + " writes. Readers: " + this.currentReaders.size() + ", Writers: " + this.currentWriter.size());
-            this.readData(writer);
-        } else {
-            System.out.println(writer.getName() + " has to wait to overwrite the data...");
-        }
-    }
-    public void appendData(Writer writer, String dataToAppend) {
-        if (currentWriter.contains(writer)) {
-            this.data.concat(dataToAppend);
-            System.out.println(writer.getName() + " writes.");
-            this.exit(writer);
-        } else {
-            System.out.println(writer.getName() + " has to wait to append the data...");
-        }
+    /**
+     * Get write lock
+     */
+    public void writeLock() throws InterruptedException {
+        writersSemaphore.acquire();
     }
 
+    /**
+     * Release write lock
+     */
+    public void writeUnlock(){
+        writersSemaphore.release();
+    }
 
-    // private
-    private String data;
-    private final ArrayList<Reader> currentReaders = new ArrayList<>();
-    private final ArrayList<Writer> currentWriter = new ArrayList<>(1);
+    private static int readersInRoom = 0;
+    private static final int MAX_READERS = 5;
+    private static final int MAX_WRITERS = 1;
+    private final Semaphore readersSemaphore = new Semaphore(MAX_READERS, true);
+    private final Semaphore writersSemaphore = new Semaphore(MAX_WRITERS, true);
 }
