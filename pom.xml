@@ -5,7 +5,7 @@
   <artifactId>czytelnia</artifactId>
   <version>1.0</version>
 
-  <name>Przyklad - aplikacja wielomodulowa</name>
+  <name>Czytelnia - Problem czytelników i pisarzy</name>
   <packaging>pom</packaging>
 
   <!-- Dodane przez pskrzynski -->

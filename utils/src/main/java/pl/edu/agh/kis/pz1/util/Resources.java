@@ -8,31 +8,48 @@ public class Resources {
      * Get read lock
      */
     public void readLock() throws InterruptedException {
-        readersSemaphore.acquire();
-        if(readersInRoom == 0) {                // the first Reader acquires writersSemaphore to prevent writers to enter room
-            writersSemaphore.acquire();
+        System.out.println(Thread.currentThread().getName() + " wants to enter the room.");
+
+        if(!theFirstReaderAppeared) {                // the first Reader acquires auxiliarySemaphore to prevent writers to enter room
+            theFirstReaderAppeared = true;
+            auxiliarySemaphore.acquire();
+            readersInRoom++;
+            readersSemaphore.acquire();
+        } else {
+            while(readersInRoom==0) {
+                Thread.sleep(1000);
+            }
+            readersSemaphore.acquire();
+            readersInRoom++;
         }
-        readersInRoom++;
-        readersSemaphore.release();
+
     }
+
 
     /**
      * Release read lock
      */
     public void readUnlock() throws InterruptedException {
-        readersSemaphore.acquire();
         readersInRoom--;
         if(readersInRoom == 0){                 // if no readers left in room
-            writersSemaphore.release();
+            readersSemaphore.release();
+            System.out.println(Thread.currentThread().getName() + " left.");
+            theFirstReaderAppeared = false;
+            auxiliarySemaphore.release();
+        } else {
+            readersSemaphore.release();
+            System.out.println(Thread.currentThread().getName() + " left.");
         }
-        readersSemaphore.release();
     }
 
     /**
      * Get write lock
      */
     public void writeLock() throws InterruptedException {
+        System.out.println(Thread.currentThread().getName() + " wants to enter the room.");
+        auxiliarySemaphore.acquire();
         writersSemaphore.acquire();
+        writersInRoom++;
     }
 
     /**
@@ -40,11 +57,17 @@ public class Resources {
      */
     public void writeUnlock(){
         writersSemaphore.release();
+        System.out.println(Thread.currentThread().getName() + " left.");
+        writersInRoom--;
+        auxiliarySemaphore.release();
     }
 
-    private static int readersInRoom = 0;
+    public int readersInRoom = 0;
+    public int writersInRoom = 0;
+    public volatile boolean theFirstReaderAppeared = false;
     private static final int MAX_READERS = 5;
     private static final int MAX_WRITERS = 1;
-    private final Semaphore readersSemaphore = new Semaphore(MAX_READERS, true);
-    private final Semaphore writersSemaphore = new Semaphore(MAX_WRITERS, true);
+    public final Semaphore readersSemaphore = new Semaphore(MAX_READERS, true);
+    public final Semaphore writersSemaphore = new Semaphore(MAX_WRITERS, true);
+    public final Semaphore auxiliarySemaphore = new Semaphore(1, true);
 }
