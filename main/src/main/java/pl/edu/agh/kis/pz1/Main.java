@@ -2,6 +2,10 @@ package pl.edu.agh.kis.pz1;
 
 import pl.edu.agh.kis.pz1.util.*;
 
+/**
+ * Main method for ReadersWriters program
+ * It creates Resource object, then calls Writers and Readers
+ * */
 public class  Main {
     public static void main( String[] args ) {
         Resources res = new Resources();

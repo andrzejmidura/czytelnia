@@ -1,35 +1,31 @@
 package pl.edu.agh.kis.pz1.util;
 
-public class Writer extends Reader{
+public class Writer extends Thread{
 
     @Override
     public void run() {
         while (true) {
             try {
                 this.res.writeLock();
-            } catch (InterruptedException ignored) {}
-            System.out.println("        " + this.getName() + " writes and reads...      In room: " + (5-this.res.readersSemaphore.availablePermits()) + " readers, " + (1-this.res.writersSemaphore.availablePermits()) + " writers.");
 
-            try {
+                System.out.println("        " + this.getName() + " writes and reads...      In room: " + (5-this.res.readersSemaphore.availablePermits()) + " readers, " + (1-this.res.writersSemaphore.availablePermits()) + " writers.");
+
                 sleep(1000);
-            } catch (InterruptedException ignored) {}
 
-            this.res.writeUnlock();
+                this.res.writeUnlock();
 
-            try {
-                sleep(10000);
-            } catch (InterruptedException ignored) {}
+                sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
-    public Writer() {}
 
     public Writer(int i, Resources res) {
-        super();
-        this.dataToWrite = "Data written by Writer" + i + ".";
-        super.setName("Writer" + i);
-        super.res = res;
+        this.setName("Writer" + i);
+        this.res = res;
     }
 
-    private String dataToWrite;
+    protected Resources res;
 }

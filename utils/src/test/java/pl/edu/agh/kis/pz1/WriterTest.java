@@ -1,6 +1,7 @@
 package pl.edu.agh.kis.pz1;
 
 import org.junit.Test;
+import pl.edu.agh.kis.pz1.util.Resources;
 import pl.edu.agh.kis.pz1.util.Writer;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -13,7 +14,8 @@ public class WriterTest {
      */
     @Test
     public void shouldCreateWriterObject(){
-        Writer writer = new Writer();
+        Resources res = new Resources();
+        Writer writer = new Writer(1, res);
         assertNotNull("Writer object created.", writer);
     }
 }
